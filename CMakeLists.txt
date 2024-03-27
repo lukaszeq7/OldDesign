@@ -21,6 +21,8 @@ add_executable(OldDesign main.cpp
         BedModel.h
         Bed.cpp
         Bed.h
+        Database.cpp
+        Database.h
 )
 target_link_libraries(OldDesign
         Qt5::Core

@@ -7,41 +7,27 @@ MainWindow::MainWindow(QWidget *parent) :
         , _mainLayout(new QVBoxLayout(this))
         , _tableView(new QTableView(this))
         , _bedModel(new BedModel(this))
+        , _db(new Database(this))
 {
     setFixedSize(800, 600);
 
     _mainLayout->addWidget(_tableView);
     _tableView->setModel(_bedModel);
 
-    _db = QSqlDatabase::addDatabase("QSQLITE");
-    _db.setDatabaseName("baza.db");
+    connect(_db, &Database::bedsFetched, this, &MainWindow::onBedsFetched);
+    connect(_db, &Database::errorOccurred, this, &MainWindow::onErrorOccurred);
 
-    if (!_db.open())
-    {
-        qDebug() << "Nie udało się połączyć z bazą danych!";
-        return;
-    }
+    _db->fetchBeds();
+}
 
-    QSqlQuery query("SELECT * FROM Bed;");
-    if (!query.exec())
-    {
-        qDebug() << "Błąd podczas wykonywania zapytania SQL:";
-        return;
-    }
+MainWindow::~MainWindow()
+{
+    qDeleteAll(_beds);
+}
 
-    while (query.next())
-    {
-        Bed *bed = new Bed(this);
-
-        bed->setId(query.value(0).toInt());
-        bed->setName(query.value(1).toString());
-        bed->setWidth(query.value(2).toInt());
-        bed->setLength(query.value(3).toInt());
-        bed->setHeight(query.value(4).toInt());
-        bed->setFabric(query.value(5).toString());
-
-        _beds.append(bed);
-    }
+void MainWindow::onBedsFetched(QList<Bed*> beds)
+{
+    _beds = beds;
 
     for(Bed* bed : _beds)
     {
@@ -49,8 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 }
 
-MainWindow::~MainWindow()
+void MainWindow::onErrorOccurred(QString errorMessage)
 {
-    _db.close();
-    qDeleteAll(_beds);
+    qDebug() << "Błąd: " << errorMessage;
 }

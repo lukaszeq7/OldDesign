@@ -4,9 +4,9 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QTableView>
-#include <QSqlDatabase>
 #include "Bed.h"
 #include "BedModel.h"
+#include "Database.h"
 
 class MainWindow : public QWidget
 {
@@ -17,13 +17,18 @@ public:
 
     ~MainWindow() override;
 
+public slots:
+    void onBedsFetched(QList<Bed*> beds);
+    void onErrorOccurred(QString errorMessage);
+
 private:
     QVBoxLayout* _mainLayout;
     QTableView* _tableView;
-    BedModel* _bedModel;
-    QSqlDatabase _db;
 
     QList<Bed*> _beds;
+    BedModel* _bedModel;
+
+    Database* _db;
 };
 
 #endif //OLDDESIGN_MAINWINDOW_H
