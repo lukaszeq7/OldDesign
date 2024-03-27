@@ -13,7 +13,7 @@ public:
 
 public slots:
     int id() const;
-    void setId(int &id);
+    void setId(int id);
 
     const QString &name() const;
     void setName(const QString &name);

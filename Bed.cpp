@@ -15,7 +15,7 @@ int Bed::id() const
     return _id;
 }
 
-void Bed::setId(int &id)
+void Bed::setId(int id)
 {
     _id = id;
 }
