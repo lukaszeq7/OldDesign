@@ -25,6 +25,8 @@ add_executable(OldDesign main.cpp
         Database.h
         Application.cpp
         Application.h
+        BedsWidget.cpp
+        BedsWidget.h
 )
 
 target_link_libraries(OldDesign

@@ -18,6 +18,7 @@ public:
 
 public slots:
     void fetchBeds();
+    void onErrorOccurred(QString errorMessage);
 
 signals:
     void bedsFetched(const QList<Bed*>& beds);

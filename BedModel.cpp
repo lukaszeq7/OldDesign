@@ -2,12 +2,15 @@
 
 BedModel::BedModel(QObject *parent)
         : QAbstractTableModel(parent)
+        , _database(new Database(this))
 {
-    _data.append({"lolek"});
+    connect(_database, &Database::bedsFetched, this, &BedModel::onBedsFetched);
+    initData();
 }
 
 BedModel::~BedModel()
 {
+    qDeleteAll(_beds);
 }
 
 int BedModel::rowCount(const QModelIndex &parent) const
@@ -17,7 +20,7 @@ int BedModel::rowCount(const QModelIndex &parent) const
         return 0;
     }
 
-    return _data.size();
+    return _beds.count();
 }
 
 int BedModel::columnCount(const QModelIndex &parent) const
@@ -27,24 +30,48 @@ int BedModel::columnCount(const QModelIndex &parent) const
         return 0;
     }
 
-    if (_data.isEmpty())
+    if (_beds.isEmpty())
     {
         return 0;
     }
 
-    return _data[0].size();
+    return _headerData.count();
 }
 
 QVariant BedModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
-    {
         return QVariant();
-    }
 
-    if (role == Qt::DisplayRole || role == Qt::EditRole)
+    if (index.row() >= _beds.size() || index.row() < 0)
+        return QVariant();
+
+    if (role == Qt::DisplayRole)
     {
-        return _data[index.row()][index.column()];
+        int row = index.row();
+        int column = index.column();
+
+        Bed* bed = _beds.at(row);
+        if (!bed)
+            return QVariant();
+
+        switch (column)
+        {
+            case 0:
+                return QVariant(bed->id());
+            case 1:
+                return QVariant(bed->name());
+            case 2:
+                return QVariant(bed->width());
+            case 3:
+                return QVariant(bed->length());
+            case 4:
+                return QVariant(bed->height());
+            case 5:
+                return QVariant(bed->fabric());
+            default:
+                return QVariant();
+        }
     }
 
     return QVariant();
@@ -57,10 +84,18 @@ QVariant BedModel::headerData(int section, Qt::Orientation orientation, int role
 
     if (orientation == Qt::Horizontal)
     {
-        return QString("Column %1").arg(section);
+        return _headerData[section];
     }
-    else
-    {
-        return QString("Row %1").arg(section);
-    }
+    return QVariant();
+}
+
+void BedModel::initData()
+{
+    _database->fetchBeds();
+    _headerData << "Id" << "Name" << "Width" << "Length" << "Height" << "Fabric";
+}
+
+void BedModel::onBedsFetched(QList<Bed*> beds)
+{
+    _beds = beds;
 }

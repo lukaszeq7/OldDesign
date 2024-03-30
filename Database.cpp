@@ -7,6 +7,8 @@ Database::Database(QObject *parent)
     if (!_db.open()) {
         emit errorOccurred("Nie udało się połączyć z bazą danych: " + _db.lastError().text());
     }
+
+    connect(this, &Database::errorOccurred, this, &Database::onErrorOccurred);
 }
 
 Database::~Database()
@@ -40,4 +42,9 @@ void Database::fetchBeds()
     }
 
     emit bedsFetched(beds);
+}
+
+void Database::onErrorOccurred(QString errorMessage)
+{
+    qDebug() << "Błąd: " << errorMessage;
 }

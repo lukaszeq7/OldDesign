@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
-#include <QTableView>
+#include "BedsWidget.h"
 
 class MainWindow : public QWidget
 {
@@ -15,7 +15,7 @@ public:
 
 private:
     QVBoxLayout* _mainLayout;
-    QTableView* _tableView;
+    BedsWidget* _bedsWidget;
 };
 
 #endif //OLDDESIGN_MAINWINDOW_H
