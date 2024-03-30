@@ -1,5 +1,5 @@
-#ifndef BEDMODEL_H
-#define BEDMODEL_H
+#ifndef OLDDESIGN_BEDMODEL_H
+#define OLDDESIGN_BEDMODEL_H
 
 #include <QAbstractTableModel>
 #include <QVector>
@@ -21,4 +21,4 @@ private:
     QVector<QVector<QVariant>> _data;
 };
 
-#endif // BEDMODEL_H
+#endif // OLDDESIGN_BEDMODEL_H

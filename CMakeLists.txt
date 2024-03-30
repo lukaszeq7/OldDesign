@@ -6,13 +6,13 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-
 find_package(Qt5 COMPONENTS
         Core
         Gui
         Widgets
         Sql
-        REQUIRED)
+        REQUIRED
+)
 
 add_executable(OldDesign main.cpp
         MainWindow.cpp
@@ -23,7 +23,10 @@ add_executable(OldDesign main.cpp
         Bed.h
         Database.cpp
         Database.h
+        Application.cpp
+        Application.h
 )
+
 target_link_libraries(OldDesign
         Qt5::Core
         Qt5::Gui
