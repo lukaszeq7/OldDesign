@@ -2,9 +2,11 @@
 #define OLDDESIGN_BEDSWIDGET_H
 
 #include <QWidget>
-#include <QVBoxLayout>
-#include <QTableView>
 #include "BedModel.h"
+
+QT_BEGIN_NAMESPACE
+namespace Ui { class BedsWidget; }
+QT_END_NAMESPACE
 
 class BedsWidget : public QWidget
 {
@@ -14,12 +16,17 @@ public:
     explicit BedsWidget(QWidget *parent = nullptr);
     ~BedsWidget() override;
 
+private slots:
+    void onAddButtonClicked();
+    void onDeleteButtonClicked();
+    void onEditButtonClicked();
+    void addBed(Bed* bed);
+
 private:
-    QVBoxLayout* _mainLayout;
-    QTableView* _tableView;
+    Ui::BedsWidget *ui;
     BedModel* _bedModel;
 
-    void setupUi();
+    void setConnections();
 };
 
 #endif //OLDDESIGN_BEDSWIDGET_H

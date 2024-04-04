@@ -16,16 +16,28 @@ public:
     explicit Database(QObject *parent = nullptr);
     ~Database();
 
+    void connectToDatabase();
+
 public slots:
     void fetchBeds();
+    void onBedsFetched();
+
+    void saveBed(Bed* bed);
+    void onBedSaved(Bed* bed);
+
+    void deleteBed(int bedId);
+    void onBedDeleted(int bedId);
+
     void onErrorOccurred(QString errorMessage);
 
 signals:
     void bedsFetched(const QList<Bed*>& beds);
     void errorOccurred(const QString errorMessage);
+    void bedSaved(Bed* bed);
+    void bedDeleted(int bedId);
 
 private:
-    QSqlDatabase _db;
+    QSqlDatabase _database;
 };
 
 #endif //OLDDESIGN_DATABASE_H

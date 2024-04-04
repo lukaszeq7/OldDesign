@@ -91,6 +91,7 @@ QVariant BedModel::headerData(int section, Qt::Orientation orientation, int role
 
 void BedModel::initData()
 {
+    _database->connectToDatabase();
     _database->fetchBeds();
     _headerData << "Id" << "Name" << "Width" << "Length" << "Height" << "Fabric";
 }
@@ -98,4 +99,44 @@ void BedModel::initData()
 void BedModel::onBedsFetched(QList<Bed*> beds)
 {
     _beds = beds;
+}
+
+void BedModel::addBed(Bed *bed)
+{
+    bed->setId(_beds.last()->id() + 1);
+    _beds.append(bed);
+    _database->saveBed(bed);
+
+    reload();
+}
+
+void BedModel::removeSelectedRows(const QModelIndexList &indexes)
+{
+    QModelIndex firstIndex = indexes.first();
+    if (firstIndex.isValid())
+    {
+        int bedId = firstIndex.data(Qt::DisplayRole).toInt();
+        removeRow(firstIndex.row(), firstIndex.parent());
+        _database->deleteBed(bedId);
+
+        for(int i = 0; i < _beds.count(); i++)
+        {
+            if(_beds[i]->id() == bedId)
+            {
+                _beds.removeAt(i);
+                break;
+            }
+        }
+    }
+
+    reload();
+}
+
+void BedModel::reload()
+{
+    QModelIndex topLeft     = index(0, 0);
+    QModelIndex bottomRight = index( rowCount() - 1, columnCount() - 1 );
+
+    emit dataChanged(topLeft, bottomRight);
+    emit layoutChanged();
 }
