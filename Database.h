@@ -28,6 +28,9 @@ public slots:
     void deleteBed(int bedId);
     void onBedDeleted(int bedId);
 
+    void updateBed(Bed* bed);
+    void onBedUpdated(Bed* bed);
+
     void onErrorOccurred(QString errorMessage);
 
 signals:
@@ -35,6 +38,7 @@ signals:
     void errorOccurred(const QString errorMessage);
     void bedSaved(Bed* bed);
     void bedDeleted(int bedId);
+    void bedUpdated(Bed* bed);
 
 private:
     QSqlDatabase _database;

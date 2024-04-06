@@ -5,6 +5,7 @@ Database::Database(QObject *parent)
     connect(this, &Database::bedsFetched, this, &Database::onBedsFetched);
     connect(this, &Database::bedSaved, this, &Database::onBedSaved);
     connect(this, &Database::bedDeleted, this, &Database::onBedDeleted);
+    connect(this, &Database::bedUpdated, this, &Database::onBedUpdated);
     connect(this, &Database::errorOccurred, this, &Database::onErrorOccurred);
 }
 
@@ -52,7 +53,7 @@ void Database::fetchBeds()
 
     while (query.next())
     {
-        Bed *bed = new Bed();
+        Bed *bed = new Bed(this);
         bed->setId(query.value(0).toInt());
         bed->setName(query.value(1).toString());
         bed->setWidth(query.value(2).toInt());
@@ -111,6 +112,39 @@ void Database::deleteBed(int bedId)
     emit bedDeleted(bedId);
 }
 
+void Database::updateBed(Bed* bed)
+{
+    if (!_database.isOpen())
+    {
+        _database.open();
+        if (!_database.isOpen())
+        {
+            emit errorOccurred("Can't connect to database: " + _database.lastError().text());
+            return;
+        }
+    }
+
+    QSqlQuery query(_database);
+    query.prepare("UPDATE Bed "
+                  "SET name = :name, width = :width, length = :length, height = :height, fabric = :fabric "
+                  "WHERE id = :id");
+    query.bindValue(":id", bed->id());
+    query.bindValue(":name", bed->name());
+    query.bindValue(":width", bed->width());
+    query.bindValue(":length", bed->length());
+    query.bindValue(":height", bed->height());
+    query.bindValue(":fabric", bed->fabric());
+
+    if (!query.exec())
+    {
+        emit errorOccurred("Error while updating the bed in the database: " + query.lastError().text());
+        return;
+    }
+
+    emit bedUpdated(bed);
+}
+
+
 void Database::onErrorOccurred(QString errorMessage)
 {
     qDebug() << "Error: " << errorMessage;
@@ -118,7 +152,7 @@ void Database::onErrorOccurred(QString errorMessage)
 
 void Database::onBedSaved(Bed* bed)
 {
-    qDebug() << "Database ADD bed:"
+    qDebug() << "Database ADDED bed:"
         << bed->id()
         << bed->name()
         << "Width:" << bed->width()
@@ -135,4 +169,15 @@ void Database::onBedDeleted(int bedId)
 void Database::onBedsFetched()
 {
     qDebug() << "Beds FETCHED from database";
+}
+
+void Database::onBedUpdated(Bed *bed)
+{
+    qDebug() << "Database UPDATED bed:"
+             << bed->id()
+             << bed->name()
+             << "Width:" << bed->width()
+             << "Length:" << bed->length()
+             << "Height:" << bed->height()
+             << "Fabric" << bed->fabric();
 }

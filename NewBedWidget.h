@@ -16,15 +16,21 @@ public:
     explicit NewBedWidget(QWidget *parent = nullptr);
     ~NewBedWidget() override;
 
+    void editBedForm(Bed *bed);
+
 signals:
     void addBed(Bed* bed);
+    void editBed(Bed* bed);
+    void closeWidget(bool isOpen);
 
 private slots:
     void onExitButtonClicked();
-    void onAddButtonClicked();
+    void onOkButtonClicked();
 
 private:
     Ui::NewBedWidget *ui;
+    bool _editMode;
+    Bed* _editBed;
 
     void setPosition(QWidget* parent);
     void setConnections();

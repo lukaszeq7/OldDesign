@@ -20,7 +20,11 @@ private slots:
     void onAddButtonClicked();
     void onDeleteButtonClicked();
     void onEditButtonClicked();
+
     void addBed(Bed* bed);
+    void editBed(Bed* bed);
+
+    void disableButtons(bool disable);
 
 private:
     Ui::BedsWidget *ui;

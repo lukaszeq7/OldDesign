@@ -16,9 +16,7 @@ BedModel::~BedModel()
 int BedModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
-    {
         return 0;
-    }
 
     return _beds.count();
 }
@@ -26,14 +24,10 @@ int BedModel::rowCount(const QModelIndex &parent) const
 int BedModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
-    {
         return 0;
-    }
 
     if (_beds.isEmpty())
-    {
         return 0;
-    }
 
     return _headerData.count();
 }
@@ -83,9 +77,8 @@ QVariant BedModel::headerData(int section, Qt::Orientation orientation, int role
         return QVariant();
 
     if (orientation == Qt::Horizontal)
-    {
         return _headerData[section];
-    }
+
     return QVariant();
 }
 
@@ -101,31 +94,42 @@ void BedModel::onBedsFetched(QList<Bed*> beds)
     _beds = beds;
 }
 
-void BedModel::addBed(Bed *bed)
+void BedModel::addBed(Bed* bed)
 {
+    _database->saveBed(bed);
+
     bed->setId(_beds.last()->id() + 1);
     _beds.append(bed);
-    _database->saveBed(bed);
 
     reload();
 }
 
-void BedModel::removeSelectedRows(const QModelIndexList &indexes)
+void BedModel::editBed(Bed* bed)
 {
-    QModelIndex firstIndex = indexes.first();
-    if (firstIndex.isValid())
-    {
-        int bedId = firstIndex.data(Qt::DisplayRole).toInt();
-        removeRow(firstIndex.row(), firstIndex.parent());
-        _database->deleteBed(bedId);
+    _database->updateBed(bed);
 
-        for(int i = 0; i < _beds.count(); i++)
+    for(int i = 0; i < _beds.count(); i++)
+    {
+        if(_beds[i]->id() == bed->id())
         {
-            if(_beds[i]->id() == bedId)
-            {
-                _beds.removeAt(i);
-                break;
-            }
+            _beds[i] = bed;
+            break;
+        }
+    }
+
+    reload();
+}
+
+void BedModel::deleteBed(int bedId)
+{
+    _database->deleteBed(bedId);
+
+    for(int i = 0; i < _beds.count(); i++)
+    {
+        if(_beds[i]->id() == bedId)
+        {
+            _beds.removeAt(i);
+            break;
         }
     }
 
@@ -139,4 +143,30 @@ void BedModel::reload()
 
     emit dataChanged(topLeft, bottomRight);
     emit layoutChanged();
+}
+
+Bed* BedModel::getBed(int bedId)
+{
+    for(int i = 0; i < _beds.count(); i++)
+    {
+        if(_beds[i]->id() == bedId)
+        {
+            return _beds[i];
+        }
+    }
+
+    return nullptr;
+}
+
+void BedModel::displayBeds()
+{
+    for(Bed* bed : _beds)
+    {
+        qDebug() << bed->id()
+                 << bed->name()
+                 << "Width:" << bed->width()
+                 << "Length:" << bed->length()
+                 << "Height:" << bed->height()
+                 << "Fabric" << bed->fabric();
+    }
 }

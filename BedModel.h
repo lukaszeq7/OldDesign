@@ -3,6 +3,7 @@
 
 #include <QAbstractTableModel>
 #include <QVector>
+#include <QItemSelection>
 #include "Bed.h"
 #include "Database.h"
 
@@ -20,7 +21,9 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     void addBed(Bed *bed);
-    void removeSelectedRows(const QModelIndexList &indexes);
+    void editBed(Bed* bed);
+    void deleteBed(int bedId);
+    Bed* getBed(int bedId);
 
 private slots:
     void onBedsFetched(QList<Bed*> beds);
@@ -32,6 +35,7 @@ private:
 
     void initData();
     void reload();
+    void displayBeds();
 };
 
 #endif // OLDDESIGN_BEDMODEL_H

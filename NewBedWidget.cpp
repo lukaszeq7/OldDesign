@@ -1,9 +1,13 @@
 #include "NewBedWidget.h"
 #include "ui_NewBedWidget.h"
 
+#include <QDebug>
+
 NewBedWidget::NewBedWidget(QWidget *parent) 
         : QWidget(parent)
         , ui(new Ui::NewBedWidget)
+        , _editMode(false)
+        , _editBed(new Bed(this))
 {
     ui->setupUi(this);
     setPosition(parent);
@@ -33,27 +37,35 @@ void NewBedWidget::setPosition(QWidget* parent)
 void NewBedWidget::setConnections()
 {
     connect(ui->exitButton, &QPushButton::clicked, this, &NewBedWidget::onExitButtonClicked);
-    connect(ui->addButton, &QPushButton::clicked, this, &NewBedWidget::onAddButtonClicked);
+    connect(ui->okButton, &QPushButton::clicked, this, &NewBedWidget::onOkButtonClicked);
 }
 
 void NewBedWidget::onExitButtonClicked()
 {
     close();
+    emit closeWidget(false);
 }
 
-void NewBedWidget::onAddButtonClicked()
+void NewBedWidget::onOkButtonClicked()
 {
-    Bed* bed = new Bed(this);
-    bed->setName(ui->nameEdit->text());
-    bed->setWidth(ui->widthEdit->text().toInt());
-    bed->setLength(ui->lengthEdit->text().toInt());
-    bed->setHeight(ui->heightEdit->text().toInt());
-    bed->setFabric(ui->fabricEdit->text());
-    emit addBed(bed);
+    _editBed->setName(ui->nameEdit->text());
+    _editBed->setWidth(ui->widthEdit->text().toInt());
+    _editBed->setLength(ui->lengthEdit->text().toInt());
+    _editBed->setHeight(ui->heightEdit->text().toInt());
+    _editBed->setFabric(ui->fabricEdit->text());
 
-    ui->confirmationLabel->setText(bed->name() + " added");
+    if(_editMode)
+    {
+        emit editBed(_editBed);
+    }
+    else
+    {
+        emit addBed(_editBed);
 
-    clearData();
+        ui->confirmationLabel->setText(_editBed->name() + " added");
+        clearData();
+        _editBed = nullptr;
+    }
 }
 
 void NewBedWidget::clearData()
@@ -63,4 +75,18 @@ void NewBedWidget::clearData()
     ui->lengthEdit->setText("");
     ui->heightEdit->setText("");
     ui->fabricEdit->setText("");
+}
+
+void NewBedWidget::editBedForm(Bed *bed)
+{
+    _editBed = bed;
+    _editMode = true;
+
+    ui->nameEdit->setText(_editBed->name());
+    ui->widthEdit->setText(QString::number(_editBed->width()));
+    ui->lengthEdit->setText(QString::number(_editBed->length()));
+    ui->heightEdit->setText(QString::number(_editBed->height()));
+    ui->fabricEdit->setText(_editBed->fabric());
+
+    ui->confirmationLabel->setText(QString::number(_editBed->id()));
 }
