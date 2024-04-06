@@ -17,11 +17,14 @@ public:
     ~NewBedWidget() override;
 
     void editBedForm(Bed *bed);
+    void setLastBedId(int lastBedId);
+    void setEditMode(bool editMode);
 
 signals:
     void addBed(Bed* bed);
     void editBed(Bed* bed);
     void closeWidget(bool isOpen);
+    void getLastBedId();
 
 private slots:
     void onExitButtonClicked();
@@ -31,6 +34,7 @@ private:
     Ui::NewBedWidget *ui;
     bool _editMode;
     Bed* _editBed;
+    int _lastBedId;
 
     void setPosition(QWidget* parent);
     void setConnections();

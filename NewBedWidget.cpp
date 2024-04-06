@@ -48,23 +48,33 @@ void NewBedWidget::onExitButtonClicked()
 
 void NewBedWidget::onOkButtonClicked()
 {
-    _editBed->setName(ui->nameEdit->text());
-    _editBed->setWidth(ui->widthEdit->text().toInt());
-    _editBed->setLength(ui->lengthEdit->text().toInt());
-    _editBed->setHeight(ui->heightEdit->text().toInt());
-    _editBed->setFabric(ui->fabricEdit->text());
-
     if(_editMode)
     {
+        _editBed->setName(ui->nameEdit->text());
+        _editBed->setWidth(ui->widthEdit->text().toInt());
+        _editBed->setLength(ui->lengthEdit->text().toInt());
+        _editBed->setHeight(ui->heightEdit->text().toInt());
+        _editBed->setFabric(ui->fabricEdit->text());
         emit editBed(_editBed);
+
+        ui->confirmationLabel->setText("Id " + QString::number(_editBed->id()) + " edited");
     }
     else
     {
-        emit addBed(_editBed);
+        Bed* bed = new Bed(this);
+        bed->setName(ui->nameEdit->text());
+        bed->setWidth(ui->widthEdit->text().toInt());
+        bed->setLength(ui->lengthEdit->text().toInt());
+        bed->setHeight(ui->heightEdit->text().toInt());
+        bed->setFabric(ui->fabricEdit->text());
 
-        ui->confirmationLabel->setText(_editBed->name() + " added");
+        emit getLastBedId();
+        bed->setId(_lastBedId + 1);//todo przy dodawaniu lozka nie zmienia id
+
+        emit addBed(bed);
+
+        ui->confirmationLabel->setText(bed->name() + " added");
         clearData();
-        _editBed = nullptr;
     }
 }
 
@@ -80,7 +90,6 @@ void NewBedWidget::clearData()
 void NewBedWidget::editBedForm(Bed *bed)
 {
     _editBed = bed;
-    _editMode = true;
 
     ui->nameEdit->setText(_editBed->name());
     ui->widthEdit->setText(QString::number(_editBed->width()));
@@ -89,4 +98,18 @@ void NewBedWidget::editBedForm(Bed *bed)
     ui->fabricEdit->setText(_editBed->fabric());
 
     ui->confirmationLabel->setText(QString::number(_editBed->id()));
+}
+
+void NewBedWidget::setLastBedId(int lastBedId)
+{
+    _lastBedId = lastBedId;
+}
+
+void NewBedWidget::setEditMode(bool editMode)
+{
+    _editMode = editMode;
+    if(!_editMode)
+    {
+        clearData();
+    }
 }

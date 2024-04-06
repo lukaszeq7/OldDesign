@@ -24,6 +24,7 @@ public:
     void editBed(Bed* bed);
     void deleteBed(int bedId);
     Bed* getBed(int bedId);
+    int lastBedId();
 
 private slots:
     void onBedsFetched(QList<Bed*> beds);

@@ -97,8 +97,6 @@ void BedModel::onBedsFetched(QList<Bed*> beds)
 void BedModel::addBed(Bed* bed)
 {
     _database->saveBed(bed);
-
-    bed->setId(_beds.last()->id() + 1);
     _beds.append(bed);
 
     reload();
@@ -156,6 +154,13 @@ Bed* BedModel::getBed(int bedId)
     }
 
     return nullptr;
+}
+
+int BedModel::lastBedId()
+{
+    if(_beds.isEmpty())
+        return -1;
+    return _beds.last()->id();
 }
 
 void BedModel::displayBeds()

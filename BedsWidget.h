@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "BedModel.h"
+#include "NewBedWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class BedsWidget; }
@@ -25,10 +26,12 @@ private slots:
     void editBed(Bed* bed);
 
     void disableButtons(bool disable);
+    void lastBedId();
 
 private:
     Ui::BedsWidget *ui;
     BedModel* _bedModel;
+    NewBedWidget* _newBedWidget;
 
     void setConnections();
 };
